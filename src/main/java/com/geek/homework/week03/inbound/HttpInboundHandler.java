@@ -1,27 +1,28 @@
 package com.geek.homework.week03.inbound;
 
-import com.geek.homework.week03.filter.HeaderHttpRequestFilter;
 import com.geek.homework.week03.filter.HttpRequestFilter;
+import com.geek.homework.week03.filter.MyHttpRequestFilter;
 import com.geek.homework.week03.outbound.httpclient4.HttpOutboundHandler;
+import com.geek.homework.week03.outbound.okhttp.OkHttpOutboundHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.util.ReferenceCountUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class HttpInboundHandler extends ChannelInboundHandlerAdapter {
 
-    private static Logger logger = LoggerFactory.getLogger(HttpInboundHandler.class);
     private final List<String> proxyServer;
     private HttpOutboundHandler handler;
-    private HttpRequestFilter filter = new HeaderHttpRequestFilter();
+    //    private HttpRequestFilter filter = new HeaderHttpRequestFilter();
+    private OkHttpOutboundHandler okHttpOutboundHandler;
+    private HttpRequestFilter filter = new MyHttpRequestFilter();
 
     public HttpInboundHandler(List<String> proxyServer) {
         this.proxyServer = proxyServer;
-        this.handler = new HttpOutboundHandler(this.proxyServer);
+//        this.handler = new HttpOutboundHandler(this.proxyServer);
+        this.okHttpOutboundHandler = new OkHttpOutboundHandler(this.proxyServer);
     }
 
     @Override
@@ -40,7 +41,8 @@ public class HttpInboundHandler extends ChannelInboundHandlerAdapter {
 //                handlerTest(fullRequest, ctx);
 //            }
 
-            handler.handle(fullRequest, ctx, filter);
+//            handler.handle(fullRequest, ctx, filter);
+            okHttpOutboundHandler.handle(fullRequest, ctx, filter);
 
         } catch(Exception e) {
             e.printStackTrace();
